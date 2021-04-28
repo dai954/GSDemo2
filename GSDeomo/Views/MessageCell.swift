@@ -14,8 +14,6 @@ class MessageCell: UITableViewCell {
     
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var rightBottomLabel: UILabel!
-    
-    
     @IBOutlet weak var leftImageView: UIImageView!
     
     

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="iyf-W0-X7s">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
@@ -25,21 +25,29 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="3gG-ld-AiI">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Byr-RY-bEf">
+                            <connections>
+                                <action selector="addButtonPressed:" destination="BYZ-38-t0r" id="4zP-Cg-yLN"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="NbZ-Sz-ewm" id="Hq1-Up-pI4"/>
                         <segue destination="AvX-lA-Xse" kind="show" identifier="PlayVideo" id="bOi-1M-4Gw"/>
+                        <segue destination="cNT-xL-BNJ" kind="presentation" identifier="captureVideo" modalPresentationStyle="fullScreen" id="I4c-OP-ctH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-900" y="115"/>
+            <point key="canvasLocation" x="10.144927536231885" y="114.50892857142857"/>
         </scene>
         <!--Video View Controller-->
         <scene sceneID="QFK-eY-XZc">
             <objects>
                 <viewController id="AvX-lA-Xse" customClass="VideoViewController" customModule="GSDeomo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="p8u-au-Q97">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Play Swing Video" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wws-Tz-4Ly">
@@ -57,7 +65,42 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kVD-dH-dXG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2.8985507246376816" y="114.50892857142857"/>
+            <point key="canvasLocation" x="944.92753623188412" y="114.50892857142857"/>
+        </scene>
+        <!--Capture View Controller-->
+        <scene sceneID="bHC-3P-SJQ">
+            <objects>
+                <viewController id="cNT-xL-BNJ" customClass="CaptureViewController" customModule="GSDeomo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="gW4-tb-1Lh">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="yDf-dc-dH5"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="ixQ-Pb-SG2"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="IH6-20-RhY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="945" y="872"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="jnz-Sy-F68">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="iyf-W0-X7s" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="xK3-C3-RQq">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.58039215690000001" green="0.92156862750000001" blue="0.80392156859999997" alpha="1" colorSpace="calibratedRGB"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="d5s-q8-7bO"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9yZ-Ok-Hkc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-900.00000000000011" y="114.50892857142857"/>
         </scene>
     </scenes>
     <resources>
