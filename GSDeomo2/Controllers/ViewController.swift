@@ -7,13 +7,13 @@
 
 import UIKit
 import CoreData
+import AVFoundation
 
 class ViewController: UIViewController {
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    var contentArray = [Content]()
-    
+    private var contentArray = [Content]()
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -77,9 +77,9 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier, for: indexPath) as! MessageCell
         
-        cell.label.text = contentArray[indexPath.row].memo
-        
         //        Load Date data from CoreData
+        
+        
         
         let newDate = contentArray[indexPath.row].date
         
@@ -87,13 +87,61 @@ extension ViewController: UITableViewDataSource {
         formatter.timeStyle = .short
         formatter.dateStyle = .short
         formatter.locale = Locale(identifier: "ja_JP")
+        DispatchQueue.main.async {
+            cell.rightBottomLabel.text = formatter.string(from: newDate!)
+            cell.label.text = self.contentArray[indexPath.row].memo
+        }
         
-        cell.rightBottomLabel.text = formatter.string(from: newDate!)
+        //        Display Thumbnail
+        let moviePATH = contentArray[indexPath.row].movie
+        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        let documentDirectory = path[0]
+        let movieFilePath = "\(documentDirectory)/\(moviePATH!)"
+        let movieURL = URL(fileURLWithPath: movieFilePath)
+//        if let thumbnail = createTnumbnail(url: movieURL) {
+//            DispatchQueue.main.async {
+//                cell.leftImageView.image = thumbnail
+//            }
+//        }
         
+        createTnumbnail(url: movieURL) { (thumbImage) in
+            cell.leftImageView.image = thumbImage
+        }
         
         return cell
     }
     
+    func createTnumbnail(url: URL, completion: @escaping ((_ image: UIImage?) -> Void)) {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
+            let thumbImage = UIImage(cgImage: cgImage)
+            DispatchQueue.main.async {
+                completion(thumbImage)
+            }
+        } catch {
+            print("Failure to generate cgImage \(error)")
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+        }
+    }
+    
+//    func createTnumbnail(url: URL) -> UIImage? {
+//
+//        do {
+//            let asset = AVAsset(url: url)
+//            let imageGenerator = AVAssetImageGenerator(asset: asset)
+//            imageGenerator.appliesPreferredTrackTransform = true
+//            let cgImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
+//            return UIImage(cgImage: cgImage)
+//        } catch {
+//            print("Failure to generate cgImage \(error)")
+//            return nil
+//        }
+//    }
     
 }
 
