@@ -27,6 +27,7 @@ class ViewController: UIViewController {
         
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
         
+        
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         print("!!!!!!!!!!!!")
         print(paths)
@@ -58,9 +59,17 @@ class ViewController: UIViewController {
         let request: NSFetchRequest<Content> = Content.fetchRequest()
         do {
             contentArray = try context.fetch(request)
-            contentArray.sort{ $0.date! > $1.date!}
+            //            contentArray.sort{ $0.date! > $1.date!}
         } catch {
             print("Error fetching data from context \(error) ")
+        }
+    }
+    
+    func saveContents() {
+        do {
+            try context.save()
+        } catch {
+            print("Error saving context \(error)")
         }
     }
     
@@ -94,15 +103,12 @@ extension ViewController: UITableViewDataSource {
         
         //        Display Thumbnail
         let moviePATH = contentArray[indexPath.row].movie
+        print("==================")
+        print(contentArray[indexPath.row])
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentDirectory = path[0]
         let movieFilePath = "\(documentDirectory)/\(moviePATH!)"
         let movieURL = URL(fileURLWithPath: movieFilePath)
-//        if let thumbnail = createTnumbnail(url: movieURL) {
-//            DispatchQueue.main.async {
-//                cell.leftImageView.image = thumbnail
-//            }
-//        }
         
         createTnumbnail(url: movieURL) { (thumbImage) in
             cell.leftImageView.image = thumbImage
@@ -110,6 +116,24 @@ extension ViewController: UITableViewDataSource {
         
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            tableView.beginUpdates()
+            
+            context.delete(contentArray[indexPath.row])
+            contentArray.remove(at: indexPath.row)
+            saveContents()
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            tableView.endUpdates()
+        }
+    }
+    
     
     func createTnumbnail(url: URL, completion: @escaping ((_ image: UIImage?) -> Void)) {
         let asset = AVAsset(url: url)
@@ -129,39 +153,43 @@ extension ViewController: UITableViewDataSource {
         }
     }
     
-//    func createTnumbnail(url: URL) -> UIImage? {
-//
-//        do {
-//            let asset = AVAsset(url: url)
-//            let imageGenerator = AVAssetImageGenerator(asset: asset)
-//            imageGenerator.appliesPreferredTrackTransform = true
-//            let cgImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
-//            return UIImage(cgImage: cgImage)
-//        } catch {
-//            print("Failure to generate cgImage \(error)")
-//            return nil
-//        }
-//    }
     
 }
 
 //MARK: - TableView Delegate Methods
 
-private var contentIndex: Int?
-
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(indexPath.row)
-        contentIndex = indexPath.row
+        
+        //        Delete the data that you choosed
+        //        context.delete(contentArray[indexPath.row])
+        //        contentArray.remove(at: indexPath.row)
+        //        saveContents()
+        //        tableView.reloadData()
+        
+        
         performSegue(withIdentifier: "PlayVideo", sender: indexPath.row)
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "PlayVideo" {
             let destinationVC = segue.destination as! PlayerViewController
-            let moviePATH = contentArray[contentIndex!].movie
-            destinationVC.moviePath = moviePATH
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let moviePATH = contentArray[indexPath.row].movie
+                destinationVC.moviePath = moviePATH
+                destinationVC.selectedRow = indexPath.row
+            }
         }
+        
+        if segue.identifier == "captureVideo" {
+            let destinationVC = segue.destination as! CaptureViewController
+            if !contentArray.isEmpty {
+                let moviePATH = contentArray[0].movie
+                destinationVC.newestMoviePath = moviePATH
+            }
+        }
+        
     }
     
 }

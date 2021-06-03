@@ -41,20 +41,36 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
         
     }
     
+    var newestMoviePath: String?
+    @IBOutlet weak var newestThumbnailButtonImage: UIButton!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        DispatchQueue.main.async {
-            self.w = self.baseView.frame.size.width
-            self.h = self.baseView.frame.size.height
-            self.showStartButton()
+        if let newestMoviePathForThumbnail = newestMoviePath {
+            let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+            let documentDirectory = path[0]
+            let movieFilePath = "\(documentDirectory)/\(newestMoviePathForThumbnail)"
+            let movieURL = URL(fileURLWithPath: movieFilePath)
+            
+            DispatchQueue.main.async {
+                self.createTnumbnail(url: movieURL) { (thumbImage) in
+                self.newestThumbnailButtonImage.setImage(thumbImage, for: .normal)
+                    
+                self.w = self.baseView.frame.size.width
+                self.h = self.baseView.frame.size.height
+                self.showStartButton()
+                }
+                
+            }
+            
         }
+        
         
         sessionQueue.async {
             switch self.setupResult {
             case .success:
-//                self.addObservers()
+                //                self.addObservers()
                 self.session.startRunning()
                 self.isSessionRunning = self.session.isRunning
                 
@@ -67,15 +83,15 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Alert button to open Settings"),
                                                             style: .`default`,
                                                             handler: { _ in
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
-                                                  options: [:],
-                                                  completionHandler: nil)
-                    }))
+                                                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
+                                                                                          options: [:],
+                                                                                          completionHandler: nil)
+                                                            }))
                     
                     self.present(alertController, animated: true, completion: nil)
                     
                 }
-    
+                
             case .configurationFailed:
                 DispatchQueue.main.async {
                     let message = NSLocalizedString("Unable to capture media", comment: "Alert message about session capture configuration")
@@ -88,7 +104,6 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
         }
         
     }
-    
     
     
     
@@ -106,7 +121,7 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
     private let sessionQueue = DispatchQueue(label: "session queue")
     private var setupResult: SessionSetupResult = .success
     
-//    AVCaptureDeviceInput instance has Ports dynamicaly. In my case, AVCaptureDeviceInput instance has VideoPort and AudioPort. So we need to use dynamic symbol.
+    //    AVCaptureDeviceInput instance has Ports dynamicaly. In my case, AVCaptureDeviceInput instance has VideoPort and AudioPort. So we need to use dynamic symbol.
     @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
     
     
@@ -123,11 +138,11 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
         
         session.beginConfiguration()
         
-//       Because default is high, I don't need to set high. But I may use midium for sharing over wifi
-//        session.sessionPreset = .medium
+        //       Because default is high, I don't need to set high. But I may use midium for sharing over wifi
+        //        session.sessionPreset = .medium
         session.sessionPreset = .high
         
-//        Add video input.
+        //        Add video input.
         do {
             var defaultVideoDevice: AVCaptureDevice?
             
@@ -160,7 +175,7 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
             return
         }
         
-//        Add an audio device input
+        //        Add an audio device input
         
         do {
             let audioDevice = AVCaptureDevice.default(for: .audio)
@@ -176,7 +191,7 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
             print("Could not create audio device input: \(error)")
         }
         
-//        Add the Movie output
+        //        Add the Movie output
         
         sessionQueue.async {
             let movieFileOutput = AVCaptureMovieFileOutput()
@@ -209,7 +224,7 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
             return
         }
         
-    //        disable the Record button until recording starts or finishes.
+        //        disable the Record button until recording starts or finishes.
         recordButton.isEnabled = false
         
         sessionQueue.async {
@@ -241,91 +256,92 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
         
     }
     
-
-func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo fileURL: URL, from connections: [AVCaptureConnection]) {
     
-    DispatchQueue.main.async {
-        self.recordButton.isEnabled = true
-        UIView.animate(withDuration: 0.2) {
-            self.showStopButton()
+    func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo fileURL: URL, from connections: [AVCaptureConnection]) {
+        
+        DispatchQueue.main.async {
+            self.recordButton.isEnabled = true
+            UIView.animate(withDuration: 0.2) {
+                self.showStopButton()
+            }
+            
         }
         
     }
     
-}
-
-
-func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
     
-    DispatchQueue.main.async {
-        self.recordButton.isEnabled = true
-        UIView.animate(withDuration: 0.2) {
-            self.showStartButton()
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+        
+        DispatchQueue.main.async {
+            self.recordButton.isEnabled = true
+            UIView.animate(withDuration: 0.2) {
+                self.showStartButton()
+            }
+
         }
         
-        let newContent = Content(context: self.context)
-        newContent.memo = "サンプルメモ2"
+        let newContent = Content(context: context)
+//            newContent.memo = "サンプルメモ2"
         newContent.date = Date()
-        newContent.movie = self.savedFilePath
-        self.saveContents()
+        newContent.movie = savedFilePath
+        saveContents()
         
         self.dismiss(animated: true, completion: nil)
         
+        
     }
     
-}
-
-
-
-//    MARK: - KVO and Notifications
-
-private var keyValueObservations = [NSKeyValueObservation]()
-
-private func addObservers() {
-    let systemPressureStateObservation = observe(\.videoDeviceInput.device.systemPressureState, options: .new) { (_, change) in
-        guard let systemPressureState = change.newValue else { return }
-        self.setRecommendedFrameRateRangeForPressureState(systemPressureState: systemPressureState)
-    }
-    keyValueObservations.append(systemPressureStateObservation)
-
-    NotificationCenter.default.addObserver(self, selector: #selector(sessionRuntimeError), name: .AVCaptureSessionRuntimeError, object: session)
-
-}
-
-
-
-
-private func setRecommendedFrameRateRangeForPressureState(systemPressureState: AVCaptureDevice.SystemPressureState) {
-    let pressureLevel = systemPressureState.level
-    if pressureLevel == .shutdown {
-        print("Session stopped running due to shutdown system pressure level.")
-    }
-}
-
-
-@objc func sessionRuntimeError(notification: NSNotification) {
-    guard let error = notification.userInfo?[AVCaptureSessionErrorKey] as? AVError else { return }
-
-    print("Capture session runtime error: \(error)")
-
-    // If media services were reset, and the last start succeeded, restart the session.
-    if error.code == .mediaServicesWereReset {
-        sessionQueue.async {
-            if self.isSessionRunning {
-                self.session.startRunning()
-                self.isSessionRunning = self.session.isRunning
-            }
+    
+    
+    //    MARK: - KVO and Notifications
+    
+    private var keyValueObservations = [NSKeyValueObservation]()
+    
+    private func addObservers() {
+        let systemPressureStateObservation = observe(\.videoDeviceInput.device.systemPressureState, options: .new) { (_, change) in
+            guard let systemPressureState = change.newValue else { return }
+            self.setRecommendedFrameRateRangeForPressureState(systemPressureState: systemPressureState)
         }
-
-}
-
-
-}
+        keyValueObservations.append(systemPressureStateObservation)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionRuntimeError), name: .AVCaptureSessionRuntimeError, object: session)
+        
+    }
+    
+    
+    
+    
+    private func setRecommendedFrameRateRangeForPressureState(systemPressureState: AVCaptureDevice.SystemPressureState) {
+        let pressureLevel = systemPressureState.level
+        if pressureLevel == .shutdown {
+            print("Session stopped running due to shutdown system pressure level.")
+        }
+    }
+    
+    
+    @objc func sessionRuntimeError(notification: NSNotification) {
+        guard let error = notification.userInfo?[AVCaptureSessionErrorKey] as? AVError else { return }
+        
+        print("Capture session runtime error: \(error)")
+        
+        // If media services were reset, and the last start succeeded, restart the session.
+        if error.code == .mediaServicesWereReset {
+            sessionQueue.async {
+                if self.isSessionRunning {
+                    self.session.startRunning()
+                    self.isSessionRunning = self.session.isRunning
+                }
+            }
+            
+        }
+        
+        
+    }
     
     
     //MARK: - Model Manupulation Method
     
-let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     func saveContents() {
         do {
@@ -339,23 +355,47 @@ let context = (UIApplication.shared.delegate as! AppDelegate).persistentContaine
     //MARK: - Edit RecordButton View
     
     var isRecording = false
-      var w: CGFloat = 0
-      var h: CGFloat = 0
-      let d: CGFloat = 50
-      let l: CGFloat = 28
+    var w: CGFloat = 0
+    var h: CGFloat = 0
+    let d: CGFloat = 50
+    let l: CGFloat = 28
     
     
     @IBOutlet weak var baseView: UIView!
     
     
     func showStartButton() {
-      recordButton.frame = CGRect(x:(w-d)/2,y:(h-d)/2,width:d,height:d)
-      recordButton.layer.cornerRadius = d/2
+        recordButton.frame = CGRect(x:(w-d)/2,y:(h-d)/2,width:d,height:d)
+        recordButton.layer.cornerRadius = d/2
     }
     
     func showStopButton() {
-      recordButton.frame = CGRect(x:(w-l)/2,y:(h-l)/2,width:l,height:l)
-      recordButton.layer.cornerRadius = 3.0
+        recordButton.frame = CGRect(x:(w-l)/2,y:(h-l)/2,width:l,height:l)
+        recordButton.layer.cornerRadius = 3.0
+    }
+    
+    
+    @IBAction func dismissButtonPressed(_ sender: UIButton) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    func createTnumbnail(url: URL, completion: @escaping ((_ image: UIImage?) -> Void)) {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
+            let thumbImage = UIImage(cgImage: cgImage)
+            DispatchQueue.main.async {
+                completion(thumbImage)
+            }
+        } catch {
+            print("Failure to generate cgImage \(error)")
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+        }
     }
     
     

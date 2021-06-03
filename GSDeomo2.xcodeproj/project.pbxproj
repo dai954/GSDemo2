@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		09057EC02631AC2B006FF0F0 /* CaputureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09057EBF2631AC2B006FF0F0 /* CaputureViewController.swift */; };
 		090747E5264D65AF00838346 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090747E4264D65AF00838346 /* PreviewView.swift */; };
+		09477F0226626D7A00D33CDF /* MemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09477F0126626D7A00D33CDF /* MemoViewController.swift */; };
 		0966DDEA26342DED004A727F /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0966DDE926342DED004A727F /* Message.swift */; };
 		0966DDEF263433B9004A727F /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0966DDED263433B9004A727F /* Model.xcdatamodeld */; };
 		09726761261F3ECA00A790F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09726760261F3ECA00A790F7 /* AppDelegate.swift */; };
@@ -28,6 +29,7 @@
 /* Begin PBXFileReference section */
 		09057EBF2631AC2B006FF0F0 /* CaputureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaputureViewController.swift; sourceTree = "<group>"; };
 		090747E4264D65AF00838346 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		09477F0126626D7A00D33CDF /* MemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoViewController.swift; sourceTree = "<group>"; };
 		0966DDE926342DED004A727F /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		0966DDEE263433B9004A727F /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		0972675D261F3ECA00A790F7 /* GSDeomo2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GSDeomo2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +119,7 @@
 				09057EBF2631AC2B006FF0F0 /* CaputureViewController.swift */,
 				090747E4264D65AF00838346 /* PreviewView.swift */,
 				099A48E52652AABC003AED10 /* PlayerView.swift */,
+				09477F0126626D7A00D33CDF /* MemoViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				09726761261F3ECA00A790F7 /* AppDelegate.swift in Sources */,
 				090747E5264D65AF00838346 /* PreviewView.swift in Sources */,
 				0966DDEF263433B9004A727F /* Model.xcdatamodeld in Sources */,
+				09477F0226626D7A00D33CDF /* MemoViewController.swift in Sources */,
 				09057EC02631AC2B006FF0F0 /* CaputureViewController.swift in Sources */,
 				09726763261F3ECA00A790F7 /* SceneDelegate.swift in Sources */,
 				0972677E261F488900A790F7 /* Constants.swift in Sources */,

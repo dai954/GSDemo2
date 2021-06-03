@@ -12,7 +12,7 @@ class PlayerViewController: UIViewController {
     
     private let player = AVPlayer()
     
-    let timeRemainingFormatter: DateComponentsFormatter = {
+    private let timeRemainingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.zeroFormattingBehavior = .pad
         formatter.allowedUnits = [.minute, .second]
@@ -20,8 +20,9 @@ class PlayerViewController: UIViewController {
     }()
     
     var moviePath: String?
+    var selectedRow: Int?
     
-    var slowMotionOnOff: Bool = true
+    private var slowMotionOnOff: Bool = true
     
     private var timeObserverToken: Any?
     
@@ -40,8 +41,11 @@ class PlayerViewController: UIViewController {
     @IBOutlet weak var errorText: UILabel!
     
     
+    @IBOutlet weak var slowButtonView: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentDirectory = path[0]
@@ -58,6 +62,10 @@ class PlayerViewController: UIViewController {
         print("-----------------------------------------")
         print(fps!)
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        slowButtonView.layer.cornerRadius = 15
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -99,7 +107,7 @@ class PlayerViewController: UIViewController {
             sender.tintColor = .red
         } else {
             slowMotionOnOff = true
-            sender.tintColor = .gray
+            sender.tintColor = .white
         }
     }
     
@@ -218,6 +226,22 @@ class PlayerViewController: UIViewController {
         let alertAction = UIAlertAction(title: alertActionTitle, style: .default, handler: nil)
         alert.addAction(alertAction)
         present(alert, animated: true, completion: nil)
+    }
+    
+    
+    @IBAction func memoButtonPressed(_ sender: Any) {
+        
+        self.performSegue(withIdentifier: "CreateMemo", sender: self)
+        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "CreateMemo" {
+            let destinationVC = segue.destination as! MemoViewController
+        
+            destinationVC.selectedRow = selectedRow!
+
+        }
     }
     
 }
