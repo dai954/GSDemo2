@@ -108,9 +108,11 @@ class PlayerViewController: UIViewController {
             if self.slowMotionOnOff {
                 self.slowMotionOnOff = false
                 sender.tintColor = .white
+                self.player.pause()
             } else {
                 self.slowMotionOnOff = true
                 sender.tintColor = .red
+                self.player.pause()
             }
         }
     }
