@@ -53,7 +53,7 @@ class MemoViewController: UIViewController {
         let request: NSFetchRequest<Content> = Content.fetchRequest()
         do {
             contentArray = try context.fetch(request)
-//            contentArray.sort{ $0.date! > $1.date!}
+            contentArray.sort{ $0.date! > $1.date!}
         } catch {
             print("Error fetching data from context \(error) ")
         }

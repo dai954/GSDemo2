@@ -22,7 +22,7 @@ class PlayerViewController: UIViewController {
     var moviePath: String?
     var selectedRow: Int?
     
-    private var slowMotionOnOff: Bool = true
+    private var slowMotionOnOff: Bool = false
     
     private var timeObserverToken: Any?
     
@@ -59,7 +59,7 @@ class PlayerViewController: UIViewController {
 //        To watch video's fps
         let tracks = asset.tracks(withMediaType: .video)
         let fps = tracks.first?.nominalFrameRate
-        print("-----------------------------------------")
+        print("This video frame rate is-----------------------------------------")
         print(fps!)
         
     }
@@ -90,11 +90,13 @@ class PlayerViewController: UIViewController {
             print("---------------------------------------")
             print(currentItem?.canPlaySlowForward ?? false)
             
-            if slowMotionOnOff {
-                player.rate = 1.0
-            } else {
+            
+            if slowMotionOnOff && currentItem?.canPlaySlowForward ?? false {
                 player.rate = 0.5
+            } else {
+                player.rate = 1.0
             }
+            
         default:
             player.pause()
         }
@@ -102,12 +104,14 @@ class PlayerViewController: UIViewController {
     
     
     @IBAction func slowButtonPressed(_ sender: UIButton) {
-        if slowMotionOnOff {
-            slowMotionOnOff = false
-            sender.tintColor = .red
-        } else {
-            slowMotionOnOff = true
-            sender.tintColor = .white
+        DispatchQueue.main.async {
+            if self.slowMotionOnOff {
+                self.slowMotionOnOff = false
+                sender.tintColor = .white
+            } else {
+                self.slowMotionOnOff = true
+                sender.tintColor = .red
+            }
         }
     }
     

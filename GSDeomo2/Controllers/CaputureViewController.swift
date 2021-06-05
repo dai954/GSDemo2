@@ -9,6 +9,7 @@ import UIKit
 import AVFoundation
 import AssetsLibrary
 import CoreData
+import QuickLookThumbnailing
 
 class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDelegate {
     
@@ -54,7 +55,7 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
             let movieURL = URL(fileURLWithPath: movieFilePath)
             
             DispatchQueue.main.async {
-                self.createTnumbnail(url: movieURL) { (thumbImage) in
+                self.generateThumbnailRepresentations(url: movieURL) { (thumbImage) in
                 self.newestThumbnailButtonImage.setImage(thumbImage, for: .normal)
                     
                 self.w = self.baseView.frame.size.width
@@ -394,6 +395,32 @@ class CaptureViewController: UIViewController, AVCaptureFileOutputRecordingDeleg
             print("Failure to generate cgImage \(error)")
             DispatchQueue.main.async {
                 completion(nil)
+            }
+        }
+    }
+    
+    func generateThumbnailRepresentations(url: URL, completion: @escaping ((_ image: UIImage?) -> Void)) {
+        
+        let size: CGSize = CGSize(width: 30, height: 120)
+        let scale = UIScreen.main.scale
+        
+        // Create the thumbnail request.
+        let request = QLThumbnailGenerator.Request(fileAt: url,
+                                                   size: size,
+                                                   scale: scale,
+                                                   representationTypes: .lowQualityThumbnail)
+        
+        // Retrieve the singleton instance of the thumbnail generator and generate the thumbnails.
+        let generator = QLThumbnailGenerator.shared
+        generator.generateRepresentations(for: request) { (thumbnail, type, error) in
+            DispatchQueue.main.async {
+                if thumbnail == nil || error != nil {
+                    print("fail to generate QLThumnail: \(String(describing: error))")
+                } else {
+                    // Display the thumbnail that you created.
+                    let uiImageThumbnail = thumbnail?.uiImage
+                    completion(uiImageThumbnail)
+                }
             }
         }
     }

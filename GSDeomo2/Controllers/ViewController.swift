@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 import AVFoundation
+import QuickLookThumbnailing
 
 class ViewController: UIViewController {
     
@@ -59,7 +60,7 @@ class ViewController: UIViewController {
         let request: NSFetchRequest<Content> = Content.fetchRequest()
         do {
             contentArray = try context.fetch(request)
-            //            contentArray.sort{ $0.date! > $1.date!}
+            contentArray.sort{ $0.date! > $1.date!}
         } catch {
             print("Error fetching data from context \(error) ")
         }
@@ -110,9 +111,38 @@ extension ViewController: UITableViewDataSource {
         let movieFilePath = "\(documentDirectory)/\(moviePATH!)"
         let movieURL = URL(fileURLWithPath: movieFilePath)
         
-        createTnumbnail(url: movieURL) { (thumbImage) in
-            cell.leftImageView.image = thumbImage
+        generateThumbnailRepresentations(url: movieURL) { (uiImageThumbnail) in
+
+
+            //                    print image size
+            if let image = uiImageThumbnail {
+                let imgData = NSData(data: image.jpegData(compressionQuality: 1)!)
+                var imageSize: Int = imgData.count
+                print("======================================")
+                print(String(format: "actual size of image in KB: %f ", Double(imageSize) / 1000.0))
+            }
+
+
+                cell.leftImageView.image = uiImageThumbnail
+
         }
+        
+        
+//        createTnumbnail(url: movieURL) { (thumbImage) in
+//
+//
+////                    print image size
+//            if let image = thumbImage {
+//                    let imgData = NSData(data: image.jpegData(compressionQuality: 1)!)
+//                    var imageSize: Int = imgData.count
+//                    print("======================================")
+//                    print(String(format: "actual size of image in KB: %f ", Double(imageSize) / 1000.0))
+//            }
+//
+//
+//            cell.leftImageView.image = thumbImage
+//
+//        }
         
         return cell
     }
@@ -142,6 +172,7 @@ extension ViewController: UITableViewDataSource {
         do {
             let cgImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
             let thumbImage = UIImage(cgImage: cgImage)
+            
             DispatchQueue.main.async {
                 completion(thumbImage)
             }
@@ -152,6 +183,34 @@ extension ViewController: UITableViewDataSource {
             }
         }
     }
+    
+    
+    func generateThumbnailRepresentations(url: URL, completion: @escaping ((_ image: UIImage?) -> Void)) {
+        
+        let size: CGSize = CGSize(width: 30, height: 90)
+        let scale = UIScreen.main.scale
+        
+        // Create the thumbnail request.
+        let request = QLThumbnailGenerator.Request(fileAt: url,
+                                                   size: size,
+                                                   scale: scale,
+                                                   representationTypes: .lowQualityThumbnail)
+        
+        // Retrieve the singleton instance of the thumbnail generator and generate the thumbnails.
+        let generator = QLThumbnailGenerator.shared
+        generator.generateRepresentations(for: request) { (thumbnail, type, error) in
+            DispatchQueue.main.async {
+                if thumbnail == nil || error != nil {
+                    print("fail to generate QLThumnail: (\(error)")
+                } else {
+                    // Display the thumbnail that you created.
+                    let uiImageThumbnail = thumbnail?.uiImage
+                    completion(uiImageThumbnail)
+                }
+            }
+        }
+    }
+    
     
     
 }
